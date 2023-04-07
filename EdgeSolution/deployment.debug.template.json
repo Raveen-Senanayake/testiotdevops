@@ -9,13 +9,7 @@
           "settings": {
             "minDockerVersion": "v1.25",
             "loggingOptions": "",
-            "registryCredentials": {
-              "acr": {
-                "username": "${ACR_USERNAME}",
-                "password": "${ACR_PASSWORD}",
-                "address": "${ACR_ADDRESS}"
-              }
-            }
+            "registryCredentials": {}
           }
         },
         "systemModules": {
@@ -49,11 +43,6 @@
                       {
                         "HostPort": "443"
                       }
-                    ],
-                    "9600/tcp": [
-                      {
-                        "HostPort": "9600"
-                      }
                     ]
                   }
                 }
@@ -62,88 +51,61 @@
           }
         },
         "modules": {
-          "FrontendModule": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.FrontendModule}",
-              "createOptions": {
-                "ExposedPorts": {
-                  "3000/tcp": {}
-                },
-                "NetworkingConfig": {
-                  "EndpointsConfig": {
-                    "host": {}
-                  }
-                },
-                "HostConfig": {
-                  "NetworkMode": "host",
-                  "Privileged": false,
-                  "PortBindings": {
-                    "3000/tcp": [
-                      {
-                        "HostPort": "3000"
-                      }
-                    ]
-                  }
-                }
-              }
-            },
-            "env": {
-              "APPINSIGHTS_CONNECTION_STRING": {
-                "value": "$APPINSIGHTS_CONNECTION_STRING"
-              }
-            }
-          },
           "BackendModule": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.BackendModule}",
-              "createOptions": {}
-            },
-            "env": {
-              "APPINSIGHTS_CONNECTION_STRING": {
-                "value": "$APPINSIGHTS_CONNECTION_STRING"
+              "image": "${MODULES.BackendModule.debug}",
+              "createOptions": {
+                "ExposedPorts": {
+                  "5678/tcp": {}
+                },
+                "HostConfig": {
+                  "PortBindings": {
+                    "5678/tcp": [
+                      {
+                        "HostPort": "5678"
+                      }
+                    ]
+                  }
+                }
               }
             }
           },
-          "IoTEdgeMetricsCollector": {
-            "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-metrics-collector:1.0",
-              "createOptions": ""
-            },
+          "FrontendModule": {
+            "version": "1.0",
             "type": "docker",
-            "env": {
-              "ResourceId": {
-                "value": "$IOT_HUB_RESOURCE_ID"
-              },
-              "UploadTarget": {
-                "value": "AzureMonitor"
-              },
-              "LogAnalyticsWorkspaceId": {
-                "value": "$LOG_ANALYTICS_WORKSPACE_ID"
-              },
-              "LogAnalyticsSharedKey": {
-                "value": "$LOG_ANALYTICS_SHARED_KEY"
-              },
-              "MetricsEndpointsCSV": {
-                "value": "http://edgeAgent:9600/metrics,http://edgeHub:9600/metrics"
-              },
-              "OtherConfig": {
-                "value": "<See https://aka.ms/edgemon-config for details>"
-              },
-              "AzureDomain": {
-                "value": "azure.com"
-              }
-            },
             "status": "running",
             "restartPolicy": "always",
-            "version": "1.0"
+            "settings": {
+              "image": "${MODULES.FrontendModule.debug}",
+              "createOptions": {
+                "ExposedPorts": {
+                  "9229/tcp": {}
+                },
+                "HostConfig": {
+                  "PortBindings": {
+                    "9229/tcp": [
+                      {
+                        "HostPort": "9229"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "SimulatedTemperatureSensor": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0",
+              "createOptions": {}
+            }
           }
         }
       }
@@ -151,7 +113,11 @@
     "$edgeHub": {
       "properties.desired": {
         "schemaVersion": "1.1",
-        "routes": {},
+        "routes": {
+          "BackendModuleToIoTHub": "FROM /messages/modules/BackendModule/outputs/* INTO $upstream",
+          "FrontendModuleToIoTHub": "FROM /messages/modules/FrontendModule/outputs/* INTO $upstream",
+          "sensorToFrontendModule": "FROM /messages/modules/SimulatedTemperatureSensor/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/FrontendModule/inputs/input1\")"
+        },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
         }
