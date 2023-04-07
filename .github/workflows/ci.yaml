@@ -56,12 +56,12 @@ jobs:
         run: |
           make frontend_tests
 
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1.32
-        if: always()
-        with:
-          files: ./EdgeSolution/modules/**/nose2-junit.xml
-          report_individual_runs: true
+      # - name: Publish Unit Test Results
+      #   uses: EnricoMi/publish-unit-test-result-action@v1.32
+      #   if: always()
+      #   with:
+      #     files: ./EdgeSolution/modules/**/nose2-junit.xml
+      #     report_individual_runs: true
 
       - name: Upload coverage report for backend
         uses: actions/upload-artifact@v2
