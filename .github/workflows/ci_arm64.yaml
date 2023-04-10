@@ -80,13 +80,6 @@ jobs:
         run: |
           make install_qemu
 
-      - name: Login to ACR
-        uses: Azure/docker-login@v1
-        with:
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
-
       - name: Build backend docker image
         run: |
           cd ./EdgeSolution/modules/BackendModule
