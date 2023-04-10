@@ -30,7 +30,6 @@ jobs:
           sed -i 's%^ACR_USERNAME=.*%ACR_USERNAME=${{ secrets.ACR_USERNAME }}%' ./EdgeSolution/.env
           sed -i 's%^ACR_PASSWORD=.*%ACR_PASSWORD=${{ secrets.ACR_PASSWORD }}%' ./EdgeSolution/.env
           sed -i 's%^ACR_ADDRESS=.*%ACR_ADDRESS=${{ secrets.ACR_LOGIN_SERVER }}%' ./EdgeSolution/.env
-          sed -i 's%^LOG_ANALYTICS_WORKSPACE_ID=.*%LOG_ANALYTICS_WORKSPACE_ID=${{ secrets.LOG_ANALYTICS_WORKSPACE_ID}}%' ./EdgeSolution/.env
           sed -i 's%^LOG_ANALYTICS_SHARED_KEY=.*%LOG_ANALYTICS_SHARED_KEY=${{ secrets.LOG_ANALYTICS_SHARED_KEY}}%' ./EdgeSolution/.env
           sed -i 's%^APPINSIGHTS_CONNECTION_STRING=.*%APPINSIGHTS_CONNECTION_STRING=${{ secrets.APPINSIGHTS_CONNECTION_STRING}}%' ./EdgeSolution/.env
           sed -i 's%^IOT_HUB_RESOURCE_ID=.*%IOT_HUB_RESOURCE_ID=${{ secrets.IOT_HUB_RESOURCE_ID }}%' ./EdgeSolution/.env

@@ -5,8 +5,8 @@ on: # yamllint disable-line rule:truthy
   workflow_dispatch:
 
 env:
-  ACR_IMAGE_PATH_FRONTEND: ${{ secrets.ACR_LOGIN_SERVER }}/frontendmodule:1.0.${{ github.run_number }}-arm64v8
-  ACR_IMAGE_PATH_BACKEND: ${{ secrets.ACR_LOGIN_SERVER }}/backendmodule:1.0.${{ github.run_number }}-arm64v8
+  ACR_IMAGE_PATH_FRONTEND: ${{ secrets.ACR_LOGIN_SERVER }}/frontendmodule:1.0.${{ github.run_number }}-arm32v7
+  ACR_IMAGE_PATH_BACKEND: ${{ secrets.ACR_LOGIN_SERVER }}/backendmodule:1.0.${{ github.run_number }}-arm32v7
 
 jobs:
   build:
@@ -90,17 +90,8 @@ jobs:
       - name: Build backend docker image
         run: |
           cd ./EdgeSolution/modules/BackendModule
-          docker buildx build --platform linux/arm64 -t ${{env.ACR_IMAGE_PATH_BACKEND}} -f Dockerfile.arm64v8 .
+          docker buildx build --platform linux/arm/v7 -t ${{env.ACR_IMAGE_PATH_BACKEND}} -f Dockerfile.arm32v7 .
 
-      - name: Build frontend docker image
-        run: |
-          cd ./EdgeSolution/modules/FrontendModule
-          docker buildx build --platform linux/arm64 -t ${{env.ACR_IMAGE_PATH_FRONTEND}} -f Dockerfile.arm64v8 .
-
-      - name: Push backend docker image
-        run: |
-          docker push ${{env.ACR_IMAGE_PATH_BACKEND}}
-
-      - name: Push frontend docker image
-        run: |
-          docker push ${{env.ACR_IMAGE_PATH_FRONTEND}}
+      # - name: Push backend docker image
+      #   run: |
+      #     docker push ${{env.ACR_IMAGE_PATH_BACKEND}}
